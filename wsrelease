@@ -1,0 +1,19 @@
+#!/bin/bash
+set -e
+echo "Updating local git repository from remote..."
+cd /var/local/websitesrc
+git pull
+echo "Creating deployment archive /tmp/$1.tar..."
+git archive $1 > /tmp/ws-$1.tar
+echo "Creating release folder /var/www/$1..."
+sudo -u webadmin mkdir /var/www/$1
+cd /var/www/$1
+echo "Extracting deployment archive into /var/www/$1..."
+sudo -u webadmin tar xf /tmp/ws-$1.tar
+echo "Copying settings.php files from /var/www/www.freestateproject.org to /var/www/$1..."
+cd /var/www/www.freestateproject.org
+for FL in `find -L sites -name settings.php`; do \
+  sudo -u webadmin cp $FL ../$1/$FL ; done
+echo "Linking /var/www/www.freestateproject to /var/www/$1..."
+cd /var/www
+rm www.freestateproject.org; ln -s $1 www.freestateproject.org
