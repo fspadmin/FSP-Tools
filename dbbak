@@ -1,0 +1,23 @@
+#!/bin/bash
+# 
+# (lcalitz) Back up all databases to the dev site. Meant to be called
+#   daily basis from crontab.
+
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+
+# Use the automysqlbackup config for file locations, etc.
+source /etc/automysqlbackup/automysqlbackup.conf
+
+# Backup the database
+automysqlbackup
+
+# Back up the database backup folder remotely
+#rsync -avz -e ssh --delete $BACKUPDIR dev.freestateproject.org:~/dbbak
+
+# Send an anonymized database to development once a month
+#/home/webadmin/bin/anondb freestat_dru /home/webadmin/anondb/fsp_anon.sql freestat@dev.freestateproject.org:~/anondb
+
+# Get rid of old database backup files
+find $BACKUPDIR/monthly -type f -mtime +90 -exec rm {} \;
+find $BACKUPDIR/weekly -type f -mtime +35 -exec rm {} \;
+
