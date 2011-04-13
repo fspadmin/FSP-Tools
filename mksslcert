@@ -1,0 +1,25 @@
+#!/bin/bash
+#
+# (lcalitz) Generate self-signed SSL certs for dev/test servers
+#
+set -e
+openssl genrsa -passout pass:cr0wn -des3 -out server.key 1024 > /dev/null
+openssl req -passin pass:cr0wn -new -key server.key -out server.csr > /dev/null \
+<<EOF
+US
+NH
+Concord
+Free State Project
+
+fsp.loomtree.com
+sysadmin@freestateproject.org
+
+
+EOF
+cp server.key server.key.org
+openssl rsa -passin pass:cr0wn -in server.key.org -out server.key > /dev/null
+openssl x509 -req -days 3650 -in server.csr -signkey server.key \
+  -out server.crt > /dev/null
+cp server.crt ssl.crt
+cp server.key ssl.key
+echo "ssl.crt and ssl.key created"
