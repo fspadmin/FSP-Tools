@@ -1,19 +1,83 @@
 #!/bin/bash
+#
+# Script to push an FSP code release to production. Call format:
+#
+#   wsrelease [tag-name]
+#
+# The script:
+#   - Takes both sites (FSP & Porcfest) offline
+#   - Fetches the master branch from the repository to a local repository
+#   - Exports (via git archive) the release tag specified on the command line
+#   - Extracts the export into a directory named after the tag
+#   - Relinks the website folder to the new release
+#   - Brings the sites up again, with drush
+
+# Locations
+RELEASE_REPO=/var/local/websitesrc
+WORKSPACE=/tmp
+WWW_DIR=/var/www
+WWW_LINK=www.freestateproject.org
+WEBSITE_DIR=$WWW_DIR/$WWW_LINK
+FSP_DIR=$WWW_DIR/$WWW_LINK/sites/default
+PF_DIR=$WWW_DIR/$WWW_LINK/sites/porcfest.com
+RELEASE_TAG=$1
+RELEASE_DIR=$WWW_DIR/$RELEASE_TAG
+
+# Exit if any error occurs
 set -e
+
+# Error if release dir already exists
+echo "Verifying release directory does not yet exist"
+if [ -d "$RELEASE_DIR" ]; then
+    echo "Error: Release directory $RELEASE_DIR already exists"
+    exit 1
+fi
+
+# Set the website maintenance messages, take both sites down & clear caches
+echo "Taking sites offline"
+cd $FSP_DIR
+drush vset --yes site_offline_message "The FSP website is being maintained - we should be back in 5 minutes";
+drush vset --yes site_offline 1
+drush cc all
+cd $PF_DIR
+drush vset --yes site_offline_message "The Porcfest website is being maintained - we should be back in 5 minutes";
+drush vset --yes site_offline 1
+drush cc all
+
+# Refresh the local repository, build the release & extract
 echo "Updating local git repository from remote..."
-cd /var/local/websitesrc
+cd $RELEASE_REPO
 git pull
-echo "Creating deployment archive /tmp/$1.tar..."
-git archive $1 > /tmp/ws-$1.tar
-echo "Creating release folder /var/www/$1..."
-sudo -u webadmin mkdir /var/www/$1
-cd /var/www/$1
-echo "Extracting deployment archive into /var/www/$1..."
-sudo -u webadmin tar xf /tmp/ws-$1.tar
-echo "Copying settings.php files from /var/www/www.freestateproject.org to /var/www/$1..."
-cd /var/www/www.freestateproject.org
+echo "Creating deployment archive $WORKSPACE/ws-$RELEASE_TAG.tar..."
+git archive $RELEASE_TAG > $WORKDIR/ws-$RELEASE_TAG.tar
+echo "Creating release folder $RELEASE_DIR..."
+sudo -u webadmin mkdir $RELEASE_DIR
+echo "Extracting deployment archive into $RELEASE_DIR..."
+cd $RELEASE_DIR
+sudo -u webadmin tar xf $WORKSPACE/ws-$RELEASE_TAG.tar
+
+# Copy the settings file from the current release
+#
+# TDB: Script to just extract just the passwords and insert them in the new 
+#      release's settings files
+echo "Copying settings.php files from $WEBSITE_DIR to $RELEASE_DIR..."
+cd $WEBSITE_DIR
 for FL in `find -L sites -name settings.php`; do \
-  sudo -u webadmin cp $FL ../$1/$FL ; done
-echo "Linking /var/www/www.freestateproject to /var/www/$1..."
-cd /var/www
-rm www.freestateproject.org; ln -s $1 www.freestateproject.org
+  sudo -u webadmin cp $FL $RELEASE_DIR/$FL ; 
+done
+  
+# Link the website to the new release
+echo "Linking $WEBSITE_DIR to $RELEASE_DIR..."
+cd $WWW_DIR
+rm $WEBSITE_LINK
+ln -s $RELEASE_TAG www.freestateproject.org
+
+# Bring FSP and Porcfest sites back up using drush
+echo "Bring sites back online"
+cd $FSP_DIR
+drush vset --yes site_offline 0
+drush cc all
+cd $PF_DIR
+drush vset --yes site_offline 0
+drush cc all
+
