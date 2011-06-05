@@ -69,7 +69,7 @@ done
 # Link the website to the new release
 echo "Linking $WEBSITE_DIR to $RELEASE_DIR..."
 cd $WWW_DIR
-rm $WEBSITE_LINK
+rm $WWW_LINK
 ln -s $RELEASE_TAG www.freestateproject.org
 
 # Bring FSP and Porcfest sites back up using drush
