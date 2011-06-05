@@ -49,7 +49,7 @@ echo "Updating local git repository from remote..."
 cd $RELEASE_REPO
 git pull
 echo "Creating deployment archive $WORKSPACE/ws-$RELEASE_TAG.tar..."
-git archive $RELEASE_TAG > $WORKDIR/ws-$RELEASE_TAG.tar
+git archive $RELEASE_TAG > $WORKSPACE/ws-$RELEASE_TAG.tar
 echo "Creating release folder $RELEASE_DIR..."
 sudo -u webadmin mkdir $RELEASE_DIR
 echo "Extracting deployment archive into $RELEASE_DIR..."
