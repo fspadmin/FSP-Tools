@@ -23,6 +23,9 @@ PF_DIR=$WWW_DIR/$WWW_LINK/sites/porcfest.com
 RELEASE_TAG=$1
 RELEASE_DIR=$WWW_DIR/$RELEASE_TAG
 
+# Web server file owner
+WWW_OWNER=webadmin
+
 # Exit if any error occurs
 set -e
 
@@ -32,6 +35,26 @@ if [ -d "$RELEASE_DIR" ]; then
     echo "Error: Release directory $RELEASE_DIR already exists"
     exit 1
 fi
+
+# Function to bring up website
+function site_online() {
+  trap - INT TERM EXIT
+  echo "Bring sites back online"
+  cd $FSP_DIR
+  drush vset --yes site_offline 0 || \
+    { echo "FSP site could not be brought online!"; exit 1; } 
+  drush cc all
+  cd $PF_DIR
+  drush vset --yes site_offline 0 || \
+    { echo "Porcfest site could not be brought online!"; exit 1; } 
+  drush cc all
+}
+
+# Trap errrors (set -e generates EXIT) and execute above function
+trap site_online INT TERM EXIT
+
+# Trap any errors past this point, so that the site can be brought up again
+# if anything fails
 
 # Set the website maintenance messages, take both sites down & clear caches
 echo "Taking sites offline"
@@ -63,21 +86,16 @@ sudo -u webadmin tar xf $WORKSPACE/ws-$RELEASE_TAG.tar
 echo "Copying settings.php files from $WEBSITE_DIR to $RELEASE_DIR..."
 cd $WEBSITE_DIR
 for FL in `find -L sites -name settings.php`; do \
-  sudo -u webadmin cp $FL $RELEASE_DIR/$FL ; 
+  sudo -u $WWW_OWNER cp $FL $RELEASE_DIR/$FL || ; 
 done
   
 # Link the website to the new release
 echo "Linking $WEBSITE_DIR to $RELEASE_DIR..."
 cd $WWW_DIR
 rm $WWW_LINK
-ln -s $RELEASE_TAG www.freestateproject.org
+ln -s $RELEASE_TAG $WWW_LINK
 
 # Bring FSP and Porcfest sites back up using drush
-echo "Bring sites back online"
-cd $FSP_DIR
-drush vset --yes site_offline 0
-drush cc all
-cd $PF_DIR
-drush vset --yes site_offline 0
-drush cc all
+#
+# This step is done by the site_online function being called on exit
 
