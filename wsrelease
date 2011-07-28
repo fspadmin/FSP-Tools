@@ -58,6 +58,7 @@ trap site_online INT TERM EXIT
 echo "Updating local git repository from remote..."
 cd $RELEASE_REPO
 git pull
+git fetch --tags
 echo "Creating deployment archive $WORKSPACE/ws-$RELEASE_TAG.tar..."
 git archive $RELEASE_TAG > $WORKSPACE/ws-$RELEASE_TAG.tar
 echo "Creating release folder $RELEASE_DIR..."
