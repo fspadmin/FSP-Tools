@@ -72,14 +72,15 @@ tar xf $WORKSPACE/ws-$RELEASE_TAG.tar
 #      release's settings files
 echo "Copying settings.php files from $WEBSITE_DIR to $RELEASE_DIR..."
 cd $WEBSITE_DIR
-for FL in `find -L sites -name settings.php`; do \
-  cp $FL $RELEASE_DIR/$FL; 
-done
+cp sites/default/settings.php $RELEASE_DIR/sites/default/settings.php
+cp sites/porcfest.com/settings.php $RELEASE_DIR/sites/porcfest.com/settings.php
 
 # Set ownership and access rights
 echo "Setting file ownership to $WWW_OWNER; Set all files to read-only"
 chown -R $WWW_OWNER.$WWW_OWNER $RELEASE_DIR
 chmod -R ugo-w $RELEASE_DIR
+
+exit
 
 # Set the website maintenance messages, take both sites down & clear caches
 echo "Taking sites offline"
