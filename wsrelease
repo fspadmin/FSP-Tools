@@ -80,8 +80,6 @@ echo "Setting file ownership to $WWW_OWNER; Set all files to read-only"
 chown -R $WWW_OWNER.$WWW_OWNER $RELEASE_DIR
 chmod -R ugo-w $RELEASE_DIR
 
-exit
-
 # Set the website maintenance messages, take both sites down & clear caches
 echo "Taking sites offline"
 cd $FSP_DIR
