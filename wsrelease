@@ -48,10 +48,6 @@ function site_online() {
     { echo "Porcfest site could not be brought online!"; exit 1; } 
 }
 
-# Trap errors (set -e generates EXIT) and execute above function to bring sites
-# back up
-trap site_online INT TERM EXIT
-
 # Refresh the local repository, build the release & extract
 echo "Updating local git repository from remote..."
 cd $RELEASE_REPO
@@ -78,6 +74,10 @@ cp sites/porcfest.com/settings.php $RELEASE_DIR/sites/porcfest.com/settings.php
 echo "Setting file ownership to $WWW_OWNER; Set all files to read-only"
 chown -R $WWW_OWNER.$WWW_OWNER $RELEASE_DIR
 chmod -R ugo-w $RELEASE_DIR
+
+# Trap errors (set -e generates EXIT) and execute above function to bring sites
+# back up
+trap site_online INT TERM EXIT
 
 # Set the website maintenance messages, take both sites down & clear caches
 echo "Taking sites offline"
