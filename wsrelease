@@ -43,11 +43,9 @@ function site_online() {
   cd $FSP_DIR
   drush vset --yes site_offline 0 || \
     { echo "FSP site could not be brought online!"; exit 1; } 
-  drush cc all
   cd $PF_DIR
   drush vset --yes site_offline 0 || \
     { echo "Porcfest site could not be brought online!"; exit 1; } 
-  drush cc all
 }
 
 # Trap errors (set -e generates EXIT) and execute above function to bring sites
