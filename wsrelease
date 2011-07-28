@@ -21,6 +21,7 @@ FSP_DIR=$WWW_DIR/$WWW_LINK/sites/default
 PF_DIR=$WWW_DIR/$WWW_LINK/sites/porcfest.com
 RELEASE_TAG=$1
 RELEASE_DIR=$WWW_DIR/$RELEASE_TAG
+RELEASE_REPO=/var/local/websitesrc
 
 # Web server file owner
 WWW_OWNER=webadmin
