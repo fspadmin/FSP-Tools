@@ -1,0 +1,19 @@
+#!/bin/bash
+#
+# (lcalitz) Turn all references to www.freestateproject.org and 
+# freestateproject.org in an FSP production DB into references to another site
+#
+# Call format:
+#
+#   chsite-fsp <newsite> <infile> <outfile>
+#   
+#   newsite: Domain name for new site. Both www.freestateproject.org and
+#            freestateproject.org will be re-written to this name.
+#   infile:  File containing production db dump
+#   outfile: Result db dump to be uploaded to the new site db
+#
+
+cat $2 | \
+  sed -e "s/www\.freestateproject\.org/$(printf '%q' $1)/g" | \
+  sed -e "s/freestateproject\.org/$(printf '%q' $1)/g" > $3
+
