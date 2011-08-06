@@ -1,0 +1,17 @@
+# (lcalitz) Created from old fsp server, no default existed
+# This file is under source control at git@github.com:fspadmin/FSP-Tools.git
+# Please check any changes in!
+#
+mailer-daemon: postmaster
+postmaster: root
+nobody: root
+hostmaster: root
+usenet: root
+news: root
+webmaster: root
+www: root
+ftp: root
+abuse: root
+noc: root
+security: root
+root: sysadmin@freestateproject.org
