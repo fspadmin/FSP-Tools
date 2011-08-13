@@ -63,7 +63,6 @@ sub vcl_recv {
       req.http.host == "fsp.loomtree.com") {
     set req.http.Cookie = regsuball(req.http.Cookie, "(^|;\s*)(__[a-z]+|has_js)=[^;]*", "");
 
-    // (lcalitz) Use Lullabot's config below instead of the above
     // Remove all cookies that Drupal doesn't need to know about. ANY remaining
     // cookie will cause the request to pass-through to Apache. For the most part
     // we always set the NO_CACHE cookie after any POST request, disabling the
