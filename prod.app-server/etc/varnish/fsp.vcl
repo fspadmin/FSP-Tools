@@ -111,7 +111,8 @@ sub vcl_recv {
       // Not cacheable by default
       return (pass);
     }
-
+  }
+  
   // Skip the Varnish cache for install, update, and cron
   //if (req.url ~ "install\.php|update\.php|cron\.php") {
   //  return (pass);
@@ -178,18 +179,16 @@ sub vcl_recv {
   return (lookup);
 }
 
-//sub vcl_hash {
+sub vcl_hash {
   // (lcalitz) Not needed because we pass on all cookies a la Lullabot
   //if (req.http.Cookie) {
   //  set req.hash += req.http.Cookie;
   //}
-//}
+}
 
 // Strip any cookies before an image/js/css is inserted into cache.
 sub vcl_fetch {
   if (req.url ~ "(?i)\.(png|gif|jpeg|jpg|ico|swf|css|js|html|htm)(\?[a-z0-9]+)?$") {
-    // For Varnish 2.0 or earlier, replace beresp with obj:
-    // unset obj.http.set-cookie;
     unset beresp.http.set-cookie;
   }
 }
