@@ -178,12 +178,12 @@ sub vcl_recv {
   return (lookup);
 }
 
-sub vcl_hash {
+//sub vcl_hash {
   // (lcalitz) Not needed because we pass on all cookies a la Lullabot
   //if (req.http.Cookie) {
   //  set req.hash += req.http.Cookie;
   //}
-}
+//}
 
 // Strip any cookies before an image/js/css is inserted into cache.
 sub vcl_fetch {
