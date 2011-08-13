@@ -68,7 +68,7 @@ sub vcl_recv {
     // to pass through as long as they're logged in.
     if (req.http.Cookie) {
       set req.http.Cookie = ";" req.http.Cookie;
-      set req.http.Cookie = regsuball(req.http.Cookie, "; +", ";");'
+      set req.http.Cookie = regsuball(req.http.Cookie, "; +", ";");
       set req.http.Cookie = regsuball(req.http.Cookie, ";(SESS[a-z0-9]+|NO_CACHE)=", "; \1=");
       set req.http.Cookie = regsuball(req.http.Cookie, ";[^ ][^;]*", "");
       set req.http.Cookie = regsuball(req.http.Cookie, "^[; ]+|[; ]+$", "");
