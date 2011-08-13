@@ -20,6 +20,10 @@ sub vcl_recv {
     return (pass);
   }
 
+  // (lcalitz) Set forwarding info
+  remove req.http.X-Forwarded-For;
+  set    req.http.X-Forwarded-For = client.ip;
+
   // (lcalitz) Bugfix for Varnish - force POST to use pipe.  Note local 
   // vcl_pipe() to close connection and pipe_timeout in startup 
   // params to hold it open for slo-o-o-o-o-w requests of several minutes.
