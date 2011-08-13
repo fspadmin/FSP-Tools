@@ -107,12 +107,23 @@ INSTANCE=$(uname -n)
 #
 # DAEMON_OPTS=""
 #
-# (lcalitz) Custom config
+# (lcalitz) Custom config - based on existing working config
 #
 DAEMON_OPTS="-a :80 \
              -T localhost:6082 \
-             -f /etc/varnish/default.vcl \
+             -f /etc/varnish/fsp.vcl \
              -S /etc/varnish/secret \
-             -s malloc,128M \
-	     -u www-data \
-	     -g www-data"
+	           -u www-data \
+	           -g www-data \
+             -p thread_pool_add_delay=2 \
+             -p thread_pools=4 \
+             -p thread_pool_min=200 \
+             -p thread_pool_max=4000 \
+             -p session_linger=50 \
+             -p sess_timeout=300 \
+             -p pipe_timeout=300 \
+             -p between_bytes_timeout=180 \
+             -p first_byte_timeout=180 \
+             -p connect_timeout=1 \
+             -p sess_workspace=262144 \
+             -s malloc,128M"
