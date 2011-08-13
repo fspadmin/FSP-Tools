@@ -56,8 +56,11 @@ sub vcl_recv {
   }
   
   // (lcalitz) Cookies: Use Lullabot's recommendation for Drupal
+  //   TBD: Remove loomtree.com with rollout
   if (req.http.host == "freestateproject.org" || 
-      req.http.host == "porcfest.com") {
+      req.http.host == "porcfest.com" ||
+      req.http.host == "pf.loomtree.com" ||
+      req.http.host == "fsp.loomtree.com") {
     set req.http.Cookie = regsuball(req.http.Cookie, "(^|;\s*)(__[a-z]+|has_js)=[^;]*", "");
 
     // (lcalitz) Use Lullabot's config below instead of the above
