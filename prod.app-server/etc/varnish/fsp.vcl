@@ -15,8 +15,10 @@ backend default {
 
 sub vcl_recv {
   
-  // (lcalitz) Don't cache phplist
-  if (req.http.host == "phplist.freestateproject.org") {
+  // (lcalitz) Don't cache phplist or forum
+  if ( ( req.http.host == "phplist.freestateproject.org" ) ||
+	 req.http.host == "forum.freestateproject.org" ) 
+  {
     return (pass);
   }
 
