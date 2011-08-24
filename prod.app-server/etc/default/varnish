@@ -115,7 +115,7 @@ DAEMON_OPTS="-a :80 \
              -S /etc/varnish/secret \
 	           -u www-data \
 	           -g www-data \
-             -s malloc,128M"
+             -s malloc,768M"
              
 # (lcalitz) Consider putting these back later
 #             -p thread_pool_add_delay=2 \
