@@ -15,10 +15,10 @@
 # Locations
 WORKSPACE=/tmp
 WWW_DIR=/var/www
-WWW_LINK=www.freestateproject.org
+WWW_LINK=drupal
 WEBSITE_DIR=$WWW_DIR/$WWW_LINK
-FSP_DIR=$WWW_DIR/$WWW_LINK/sites/default
-PF_DIR=$WWW_DIR/$WWW_LINK/sites/porcfest.com
+FSP_DIR=sites/default
+PF_DIR=sites/porcfest.com
 RELEASE_TAG=$1
 RELEASE_DIR=$WWW_DIR/$RELEASE_TAG
 RELEASE_REPO=/var/local/websitesrc
@@ -40,10 +40,10 @@ fi
 function site_online() {
   trap - INT TERM EXIT
   echo "Bring sites back online"
-  cd $FSP_DIR
+  cd $WEBSITE_DIR/$FSP_DIR
   drush vset --yes site_offline 0 || \
     { echo "FSP site could not be brought online!"; exit 1; } 
-  cd $PF_DIR
+  cd $WEBSITE_DIR/$PF_DIR
   drush vset --yes site_offline 0 || \
     { echo "Porcfest site could not be brought online!"; exit 1; } 
 }
@@ -67,8 +67,8 @@ tar xf $WORKSPACE/ws-$RELEASE_TAG.tar
 #      release's settings files
 echo "Copying settings.php files from $WEBSITE_DIR to $RELEASE_DIR..."
 cd $WEBSITE_DIR
-cp sites/default/settings.php $RELEASE_DIR/sites/default/settings.php
-cp sites/porcfest.com/settings.php $RELEASE_DIR/sites/porcfest.com/settings.php
+cp $WEBSITE_DIR/$FSP_DIR/settings.php $RELEASE_DIR/$FSP_DIR/settings.php
+cp $WEBSITE_DIR/$PF_DIR/settings.php $RELEASE_DIR/$PF_DIR/settings.php
 
 # Set ownership and access rights
 echo "Setting file ownership to $WWW_OWNER; Set all files to read-only"
@@ -81,12 +81,12 @@ trap site_online INT TERM EXIT
 
 # Set the website maintenance messages, take both sites down & clear caches
 echo "Taking sites offline"
-cd $FSP_DIR
+cd $WEBSITE_DIR/$FSP_DIR
 drush vset --yes site_offline_message \
   "The FSP website is being maintained - we should be back in 5 minutes";
 drush vset --yes site_offline 1
 drush cc all
-cd $PF_DIR
+cd $WEBSITE_DIR/$PF_DIR
 drush vset --yes site_offline_message \
   "The Porcfest website is being maintained - we should be back in 5 minutes";
 drush vset --yes site_offline 1
