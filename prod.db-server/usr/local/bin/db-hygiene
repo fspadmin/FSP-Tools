@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+# (lcalitz) Script to optimize databases, originally by dgarthwaite.
+#   Intended to run from cron daily. This file is under source control
+#   in the FSP Tools repository. Please check in any changes there.
+
+# MySQL login credentials
+CREDS="--defaults-extra-file=/root/.my.cnf"
+
+# Databases to optimize
+DBS="drupal_fsp drupal_porcfest smf_fsp phplist_fsp"
+
+# Clear out stale connections
+/usr/bin/mysqladmin $CREDS flush-hosts > /dev/null
+
+# Optimize production
+/usr/bin/mysqlcheck $CREDS -ao --databases $DBS > /dev/null
