@@ -1,7 +1,0 @@
-# Run drupal cron every hour, on the half-hour
-30 * * * * /usr/local/bin/drush -r /var/www/drupal -l http://freestateproject.org -q cron
-30 * * * * /usr/local/bin/drush -r /var/www/drupal -l http://porcfest.com -q cron
-
-# Run phplist batch every hour
-0 * * * * /usr/bin/php -q /var/www/phplist.freestateproject.org/admin/index.php -p processqueue > /dev/null
-
