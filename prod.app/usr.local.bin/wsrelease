@@ -2,7 +2,11 @@
 #
 # Script to push an FSP code release to production. Call format:
 #
-#   wsrelease [tag-name]
+#   wsrelease <tag-name> [patch]
+#
+#   tag-name: Required, release tag in git
+#   patch:    Optional string indicating sites should not be taken offline,
+#             typically for minor, code-only, releases
 #
 # The script:
 #   - Takes both sites (FSP & Porcfest) offline
@@ -12,6 +16,10 @@
 #   - Relinks the website folder to the new release
 #   - Brings the sites up again, with drush
 
+# Parameters
+RELEASE_TAG=$1
+PATCH=$2
+
 # Locations
 WORKSPACE=/tmp
 WWW_DIR=/var/www
@@ -19,7 +27,6 @@ WWW_LINK=drupal
 WEBSITE_DIR=$WWW_DIR/$WWW_LINK
 FSP_DIR=sites/default
 PF_DIR=sites/porcfest.com
-RELEASE_TAG=$1
 RELEASE_DIR=$WWW_DIR/$RELEASE_TAG
 RELEASE_REPO=/var/local/websitesrc
 
@@ -36,7 +43,9 @@ if [ -d "$RELEASE_DIR" ]; then
     exit 1
 fi
 
+###
 # Function to bring up website
+#
 function site_online() {
   trap - INT TERM EXIT
   echo "Bring sites back online"
@@ -46,6 +55,36 @@ function site_online() {
   cd $WEBSITE_DIR/$PF_DIR
   drush vset --yes site_offline 0 || \
     { echo "Porcfest site could not be brought online!"; exit 1; } 
+}
+
+###
+# Function to take site offline
+#
+function site_offline() {
+  # Trap errors (set -e generates EXIT) and execute above function to bring sites
+  # back up
+  trap site_online INT TERM EXIT
+
+  # Set the website maintenance messages, take both sites down & clear caches
+  echo "Taking sites offline"
+  cd $WEBSITE_DIR/$FSP_DIR
+  drush vset --yes site_offline_message \
+    "The FSP website is being maintained - we should be back in 5 minutes";
+  drush vset --yes site_offline 1
+  cd $WEBSITE_DIR/$PF_DIR
+  drush vset --yes site_offline_message \
+    "The Porcfest website is being maintained - we should be back in 5 minutes";
+  drush vset --yes site_offline 1
+}
+
+###
+# Function to clear Drupal caches
+#
+function clear_caches() {
+  cd $WEBSITE_DIR/$FSP_DIR
+  drush cc all
+  cd $WEBSITE_DIR/$PF_DIR
+  drush cc all
 }
 
 # Refresh the local repository, build the release & extract
@@ -75,22 +114,10 @@ echo "Setting file ownership to $WWW_OWNER; Set all files to read-only"
 chown -R $WWW_OWNER.$WWW_OWNER $RELEASE_DIR
 chmod -R ugo-w $RELEASE_DIR
 
-# Trap errors (set -e generates EXIT) and execute above function to bring sites
-# back up
-trap site_online INT TERM EXIT
-
-# Set the website maintenance messages, take both sites down & clear caches
-echo "Taking sites offline"
-cd $WEBSITE_DIR/$FSP_DIR
-drush vset --yes site_offline_message \
-  "The FSP website is being maintained - we should be back in 5 minutes";
-drush vset --yes site_offline 1
-drush cc all
-cd $WEBSITE_DIR/$PF_DIR
-drush vset --yes site_offline_message \
-  "The Porcfest website is being maintained - we should be back in 5 minutes";
-drush vset --yes site_offline 1
-drush cc all
+# Take site down, unless it's a patch
+if [ $PATCH != "patch" ]; then
+  site_offline
+fi
 
 # Link the website to the new release
 echo "Linking $WEBSITE_DIR to $RELEASE_DIR..."
@@ -99,5 +126,7 @@ rm $WWW_LINK
 ln -s $RELEASE_TAG $WWW_LINK
 
 # Bring FSP and Porcfest sites back up using drush
-trap - INT TERM EXIT
-site_online
+if [ $PATCH != "patch" ]; then
+  site_online
+fi
+
