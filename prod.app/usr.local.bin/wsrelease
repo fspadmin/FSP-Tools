@@ -125,7 +125,8 @@ cd $WWW_DIR
 rm $WWW_LINK
 ln -s $RELEASE_TAG $WWW_LINK
 
-# Bring FSP and Porcfest sites back up using drush
+# Clear chaches, then bring FSP and Porcfest sites back up using drush
+clear_caches
 if [ $PATCH != "patch" ]; then
   site_online
 fi
