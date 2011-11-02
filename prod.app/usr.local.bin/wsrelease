@@ -115,7 +115,7 @@ chown -R $WWW_OWNER.$WWW_OWNER $RELEASE_DIR
 chmod -R ugo-w $RELEASE_DIR
 
 # Take site down, unless it's a patch
-if [ $PATCH -ne "patch" ]; then
+if [ "$PATCH" -ne "patch" ]; then
   site_offline
 fi
 
@@ -127,7 +127,7 @@ ln -s $RELEASE_TAG $WWW_LINK
 
 # Clear caches, then bring FSP and Porcfest sites back up using drush
 clear_caches
-if [ $PATCH -ne "patch" ]; then
+if [ "$PATCH" -ne "patch" ]; then
   site_online
 fi
 
