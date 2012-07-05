@@ -2,7 +2,10 @@
 #
 # (lcalitz) Anonymize the production database
 #
-
+set -e
+DBBAK=`ls /var/local/automysqlbackup/latest | grep drupal_fsp_[w0-9].*`
+zcat /var/local/autmysqlbackup/latest/$DBBAK \
+  | mysql anon_fsp
 echo "
   truncate fsp_tmp_member_report; 
   truncate fsp_oldreg_person; 
@@ -33,8 +36,8 @@ echo "
     field_fsp_work_phone_value='22222222222',
     field_fsp_cell_phone_value='33333333333';
   " \
-  | mysql drupal_fsp_anon
-mysqldump drupal_fsp_anon \
+  | mysql anon_fsp
+mysqldump anon_fsp \
   | sed -e "s/www\.freestateproject\.org/$(printf '%q' fsp.local)/g" \
   | sed -e "s/freestateproject\.org/$(printf '%q' fsp.local)/g" \
   | gzip \
