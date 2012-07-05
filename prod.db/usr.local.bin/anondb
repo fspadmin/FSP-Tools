@@ -4,7 +4,7 @@
 #
 set -e
 DBBAK=`ls /var/local/automysqlbackup/latest | grep drupal_fsp_[w0-9].*`
-zcat /var/local/autmysqlbackup/latest/$DBBAK \
+zcat /var/local/automysqlbackup/latest/$DBBAK \
   | mysql anon_fsp
 echo "
   truncate fsp_tmp_member_report; 
