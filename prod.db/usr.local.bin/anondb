@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+# (lcalitz) Anonymize the production database
+#
+
+echo "
+  truncate fsp_tmp_member_report; 
+  truncate fsp_oldreg_person; 
+  truncate profile_values_backup;
+  truncate uc_orders;
+  truncate fsp_oldreg_mailing_list;
+  truncate fsp_members_flat;
+  truncate uc_order_admin_comments;  
+  truncate cache_filter;
+  truncate cache_workflow_ng;
+  truncate fsp_tmp_member_report;
+  truncate phplist_user_user;
+  truncate porcfest08_roadrally;
+  truncate porcfest08_tickets;
+  truncate porcfest08_vendors;
+  porcfest08_contactinfo; 
+  truncate porcfest_reg;
+  truncate porcfest_vendors;
+  truncate libertyforum_reg;
+  update users set name = concat('user',uid), pass=md5('hello123'), 
+    mail=concat('test+',uid,'@freestateproject.org'), init=concat('test+',uid,'@freestateproject.org');
+  update content_type_rolodex set 
+    field_fsp_first_name_value=concat('First_',nid), 
+    field_fsp_last_name_value=concat('Last_',nid),
+    field_fsp_address_1_value=concat('Address 1 ',nid),
+    field_fsp_address_2_value=concat('Address 2 ',nid),
+    field_fsp_home_phone_value='11111111111',
+    field_fsp_work_phone_value='22222222222',
+    field_fsp_cell_phone_value='33333333333';
+  " \
+  | mysql drupal_fsp_anon
+mysqldump drupal_fsp_anon \
+  | sed -e "s/www\.freestateproject\.org/$(printf '%q' fsp.local)/g" \
+  | sed -e "s/freestateproject\.org/$(printf '%q' fsp.local)/g" \
+  | gzip \
+  > /var/local/dev/fsp-db.sql.gz
+chown www-data.www-data /var/local/dev/fsp-db.sql.gz
