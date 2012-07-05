@@ -21,7 +21,7 @@ echo "
   truncate porcfest08_roadrally;
   truncate porcfest08_tickets;
   truncate porcfest08_vendors;
-  porcfest08_contactinfo; 
+  truncate porcfest08_contactinfo; 
   truncate porcfest_reg;
   truncate porcfest_vendors;
   truncate libertyforum_reg;
