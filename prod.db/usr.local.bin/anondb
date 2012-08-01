@@ -3,7 +3,7 @@
 # (lcalitz) Anonymize the production database
 #
 set -e
-DBBAK=`ls /var/local/automysqlbackup/latest | grep drupal_fsp_[w0-9].*`
+DBBAK=`ls /var/local/automysqlbackup/latest | grep drupal_fsp_[0-9].* | grep --invert-match drupal_fsp_.*.drupal_fsp.sql.gz`
 zcat /var/local/automysqlbackup/latest/$DBBAK \
   | mysql anon_fsp
 echo "
